@@ -8,12 +8,16 @@ def main() :
     swarm = Swarm( 10, X_LIM, Y_LIM )
 
     for i in range(0,100) :
-        drawSwarm()
+        drawSwarm( swarm )
         swarm.updateSwarm()
 
     return;
 
-def draw_swarm() :
+def drawSwarm( swarm ) :
+    temp = np.array([0,0], dtype=np.float64)
+    for boid in swarm.list :
+        temp = temp + boid.position
+    print( temp / swarm.sizeOfFlock )
     return;
 
 class Swarm :
@@ -21,16 +25,16 @@ class Swarm :
         self.sizeOfFlock = sizeOfFlock
         self.list = []
         for i in range( 0, sizeOfFlock ) :
-            self.list.append = Boid(
+            self.list.append( Boid(
                 random.randint(0,xAxis),
                 random.randint(0,yAxis),
                 0,
                 self
-            )
+            ))
 
     def updateSwarm(self) :
 
-        for boid in self.list
+        for boid in self.list :
             v1 = boid.rule1_separation() # for rule 1 - separation, avoiding collision
             v2 = boid.rule2_alignment()  # for rule 2 - alignment, matching velocity
             v3 = boid.rule3_cohesion()   # for rule 3 - cohesion, staying close to others
@@ -78,7 +82,7 @@ class Boid :
     def rule3_cohesion(self) :
         perceivedCenter = np.array([0,0], dtype=np.float64)
 
-        for b in self.swarm.list
+        for b in self.swarm.list :
             if b != self :
                 perceivedCenter = perceivedCenter + b.position;
 
@@ -86,3 +90,5 @@ class Boid :
         perceivedCenter = (perceivedCenter - self.position) / 100
 
         return perceivedCenter;
+
+main()
