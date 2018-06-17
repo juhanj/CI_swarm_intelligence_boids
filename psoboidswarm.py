@@ -1,8 +1,13 @@
 import random
 import numpy as np
+import pygame
 # http://www.kfish.org/boids/pseudocode.html
 
 def main() :
+    pygame.init()
+    size = 800, 600
+    screen = pygame.display.set_mode(size)
+
     X_LIM = 10
     Y_LIM = 10
     swarm = Swarm( 10, X_LIM, Y_LIM )
@@ -10,6 +15,25 @@ def main() :
     for i in range(0,100) :
         drawSwarm( swarm )
         swarm.updateSwarm()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit()
+
+    #for boid in boidlist
+        #boidRect = pygame.Rect()
+        #pygame.draw.rect()
+
+    #keeping boids inside window
+    #maxX = 800
+    #minX = 0
+    #maxY = 600
+    #minY = 0
+    #if boid.x > maxX
+    #elif boid.x < minX
+    #if boid.y > maxY
+    #elif boid.y < minY
+
+    pygame.display.flip()
+    pygame.time.delay(10)
 
     return;
 
@@ -62,10 +86,10 @@ class Boid :
 
         for boid in self.swarm.list :
             if boid != self :
-                if abs(boid.position - self.position) < 100 :
+                if abs(boid.position - self.position).all() < 100 :
                     c = c - (boid.position - self.position)
 
-        return c
+        return c;
 
     def rule2_alignment(self) :
         perceivedVelocity = np.array([0,0], dtype=np.float64)
