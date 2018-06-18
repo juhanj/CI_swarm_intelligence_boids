@@ -34,16 +34,19 @@ def drawSwarm( swarm ) :
     return;
 
 class Swarm :
-    def __init__(self, sizeOfFlock, xAxis, yAxis):
+    def __init__(self, sizeOfFlock, xAxis, yAxis) :
         self.sizeOfFlock = sizeOfFlock # For calculating averages
         self.bounds = [xAxis, yAxis]
         self.list = []
-        for i in range( 0, sizeOfFlock ) :
-            self.list.append( Boid(
-                random.randint(xAxis[0],xAxis[1]),
-                random.randint(yAxis[0],yAxis[1]),
-                0,
-                self
+        for i in range( 1, sizeOfFlock ) :
+##            xAxis = random.randint( xAxis[0], xAxis[1] )
+##            yAxis = random.randint( yAxis[0], yAxis[1] )
+            # For initial velocity, random values between -1 and 1, for both x and y
+            velocity = [ random.randint(-1,1), random.randint(-1,1) ]
+            self.list.append(
+                Boid( random.randint( xAxis[0], xAxis[1] ),
+                      random.randint( yAxis[0], yAxis[1] ),
+                      velocity, self
             ))
 
     def updateSwarm(self) :
@@ -55,9 +58,18 @@ class Swarm :
             v3 = boid.rule3_cohesion()   # cohesion, staying close to others
             ## Extra rules
             v4 = boid.rule4_bounds() # bounds, boid should stay inside visible boundaries
-            #v5 = boid.rule5_speedLimit() # speed limit, no arbitarily fast speeds
 
+##            print( np.round(boid.velocity,1), end=' + ' )
+##            print( np.round(v1,1), end=' + ' )
+##            print( np.round(v2,1), end=' + ' )
+##            print( np.round(v3,1), end=' + ' )
+##            print( np.round(v4,1), end='' )
+##            print('')
+            
             boid.velocity = boid.velocity + v1 + v2 + v3 + v4
+            # speed limit, no arbitarily fast speeds
+            boid.limitVelocity()
+            # Apply new position according to new velocity
             boid.position = boid.position + boid.velocity
 
         return;
@@ -67,8 +79,6 @@ class Swarm :
             print( np.round(boid.position,1), end='' )
         print('')
         return;
-        
-
 
 class Boid :
     def __init__(self, x, y, velocity, swarm):
@@ -81,58 +91,64 @@ class Boid :
         self.velocity = np.array([ 0, 0 ], dtype=np.float64)
 
     def rule1_separation(self) :
-        c = np.array([0,0], dtype=np.float64)
+        correction = np.array([0,0], dtype=np.float64)
 
         for boid in self.swarm.list :
             if boid != self :
-                if abs(boid.position - self.position).all() < 10 :
-                    c = c - (boid.position - self.position)
+                differenceMagnitude = np.linalg.norm( boid.position - self.position )
 
-        return c;
-    
+                if differenceMagnitude < 10 :
+                    correction = correction - (boid.position - self.position)
+
+        return correction;
+
     def rule2_alignment(self) :
-        perceivedVelocity = None
+        correction = np.array([0,0], dtype=np.float64)
 
         for boid in self.swarm.list :
             if boid != self :
-                if perceivedVelocity is not None :
-                    perceivedVelocity = perceivedVelocity + boid.velocity
-                else :
-                    perceivedVelocity = boid.velocity
+                correction = correction + boid.velocity
 
-        perceivedVelocity = perceivedVelocity / (self.swarm.sizeOfFlock-1)
-        perceivedVelocity = (perceivedVelocity - self.velocity) / 8;
+        correction = correction / (self.swarm.sizeOfFlock-1)
+        correction = (correction - self.velocity) / 10;
 
-        return perceivedVelocity;
+        return correction;
 
     def rule3_cohesion(self) :
-        perceivedCenter = None
+        correction = np.array([0,0], dtype=np.float64)
 
         for boid in self.swarm.list :
             if boid != self :
-                if perceivedCenter is not None :
-                    perceivedCenter = perceivedCenter + boid.position
-                else :
-                    perceivedCenter = boid.position
+                correction = correction + boid.position
 
-        perceivedCenter = perceivedCenter / (self.swarm.sizeOfFlock-1)
-        perceivedCenter = (perceivedCenter - self.position) / 100
+        correction = correction / (self.swarm.sizeOfFlock-1)
+        correction = (correction - self.position) / 50
 
-        return perceivedCenter;
+        return correction;
 
     def rule4_bounds(self) :
-        v = np.array([0,0], dtype=np.float64)
+        correction = np.array([0,0], dtype=np.float64)
 
-        if self.position[0] < self.swarm.bounds[0][0] :
-            v[0] = 10
-        elif self.position[0] > self.swarm.bounds[0][1] :
-            v[0] = -10
-        
-        if self.position[1] < self.swarm.bounds[1][0] :
-            v[1] = 10
-        elif self.position[1] > self.swarm.bounds[1][1] :
-            v[1] = -10
+        # Horizontal bounds
+        if self.position[0] < self.swarm.bounds[0][0] : # xmin
+            correction[0] = 10
+        elif self.position[0] > self.swarm.bounds[0][1] : # xmax
+            correction[0] = -10
+
+        # Vertical bounds
+        if self.position[1] < self.swarm.bounds[1][0] : # ymin
+            correction[1] = 10
+        elif self.position[1] > self.swarm.bounds[1][1] : # ymax
+            correction[1] = -10
             
-        return 0;
-
+        return correction;
+                
+    def limitVelocity(self):
+        vlim = 10.0
+        
+        velMagnitude = np.linalg.norm( self.velocity )
+        
+        # Limit speed if necessary
+        if velMagnitude > vlim:
+            self.velocity = (self.velocity / velMagnitude) * vlim
 main()
