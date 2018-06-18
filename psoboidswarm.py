@@ -25,16 +25,6 @@ def main() :
         #boidRect = pygame.Rect()
         #pygame.draw.rect()
 
-    #keeping boids inside window
-    #maxX = 800
-    #minX = 0
-    #maxY = 600
-    #minY = 0
-    #if boid.x > maxX
-    #elif boid.x < minX
-    #if boid.y > maxY
-    #elif boid.y < minY
-
     pygame.display.flip()
     pygame.time.delay(10)
 
