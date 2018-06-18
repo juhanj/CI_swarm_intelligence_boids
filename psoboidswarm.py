@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import pygame
+import time as t
 # http://www.kfish.org/boids/pseudocode.html
 
 def main() :
@@ -10,11 +11,13 @@ def main() :
 
     X_LIM = 10
     Y_LIM = 10
-    swarm = Swarm( 10, X_LIM, Y_LIM )
+    swarm = Swarm( 6, X_LIM, Y_LIM )
 
     for i in range(0,100) :
         drawSwarm( swarm )
         swarm.updateSwarm()
+        t.sleep(0.5)
+        
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
@@ -38,10 +41,9 @@ def main() :
     return;
 
 def drawSwarm( swarm ) :
-    temp = np.array([0,0], dtype=np.float64)
     for boid in swarm.list :
-        temp = temp + boid.position
-    print( temp / swarm.sizeOfFlock )
+        print( np.round(boid.position,0), end='' )
+    print('')
     return;
 
 class Swarm :
@@ -86,17 +88,21 @@ class Boid :
 
         for boid in self.swarm.list :
             if boid != self :
-                if abs(boid.position - self.position).all() < 100 :
+                if abs(boid.position - self.position).all() < 5 :
                     c = c - (boid.position - self.position)
 
         return c;
-
+    
     def rule2_alignment(self) :
-        perceivedVelocity = np.array([0,0], dtype=np.float64)
+        perceivedVelocity = None
 
         for boid in self.swarm.list :
+			print ( boid != self )
             if boid != self :
-                perceivedVelocity = perceivedVelocity + boid.velocity
+                if perceivedVelocity is not None :
+                    perceivedVelocity = perceivedVelocity + boid.velocity
+                else :
+                    perceivedVelocity = boid.velocity
 
         perceivedVelocity = perceivedVelocity / (self.swarm.sizeOfFlock-1)
         perceivedVelocity = (perceivedVelocity - self.velocity) / 8;
@@ -104,14 +110,17 @@ class Boid :
         return perceivedVelocity;
 
     def rule3_cohesion(self) :
-        perceivedCenter = np.array([0,0], dtype=np.float64)
+        perceivedCenter = None
 
-        for b in self.swarm.list :
-            if b != self :
-                perceivedCenter = perceivedCenter + b.position;
+        for boid in self.swarm.list :
+            if boid != self :
+                if perceivedCenter is not None :
+                    perceivedCenter = perceivedCenter + boid.position
+                else :
+                    perceivedCenter = boid.position
 
         perceivedCenter = perceivedCenter / (self.swarm.sizeOfFlock-1)
-        perceivedCenter = (perceivedCenter - self.position) / 100
+        perceivedCenter = (perceivedCenter - self.position) / 50
 
         return perceivedCenter;
 
