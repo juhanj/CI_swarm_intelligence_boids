@@ -1,41 +1,6 @@
 # http://www.kfish.org/boids/pseudocode.html
 import random
 import numpy as np
-import pygame
-import time as t
-
-
-def main():
-    X_LIM = [-100, 100]
-    Y_LIM = [-100, 100]
-    swarm = Swarm(6, X_LIM, Y_LIM)
-
-    pygame.init()
-    size = 400, 400
-    screen = pygame.display.set_mode(size)
-
-    boidRenderGroup = pygame.sprite.RenderPlain()
-    for boid in self.swarm.list:
-        render = BoidRender(boid)
-        boidRenderGroup.add(render)
-
-    for i in range(0, 1000):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-
-        swarm.simplePrintSwarm()
-        swarm.updateSwarm()
-        t.sleep(0.2)
-
-        #
-        # Graphics calculations here
-        #
-
-        pygame.display.flip()
-        pygame.time.delay(10)
-
-    return
 
 
 class Swarm:
@@ -43,17 +8,15 @@ class Swarm:
         self.sizeOfFlock = sizeOfFlock  # For calculating averages
         self.bounds = [xAxis, yAxis]
         self.list = []
+        temp_pos = np.random.randint(yAxis[0], yAxis[1], size=(sizeOfFlock, 2))
+        temp_vel = np.random.randint(-1, 1, size=(sizeOfFlock, 2))
+
+        # By using numpy arrays we can use simple x + y operators,
+        # instead of np.add(x,y). Makes code more readable.
+
         for i in range(1, sizeOfFlock):
-            position = [
-                random.randint(xAxis[0], xAxis[1]),
-                random.randint(yAxis[0], yAxis[1])
-            ]
-            velocity = [
-                random.randint(-1, 1),
-                random.randint(-1, 1)
-            ]
             self.list.append(
-                Boid(position, velocity, self))
+                Boid(temp_pos[i], temp_vel[i], self))
 
     def updateSwarm(self):
         for boid in self.list:
@@ -82,10 +45,8 @@ class Swarm:
 class Boid:
     def __init__(self, pos, vel, swarm):
         self.swarm = swarm
-        # By using np.array() we can use simple x + y operators,
-        # instead of np.add(x,y). Makes code more readable.
-        self.position = np.array([pos[0], pos[1]], dtype=np.float64)
-        self.velocity = np.array([vel[0], vel[1]], dtype=np.float64)
+        self.position = pos
+        self.velocity = vel
 
     def rule1_separation(self):
         correction = np.array([0, 0], dtype=np.float64)
@@ -149,5 +110,3 @@ class Boid:
         if velMagnitude > vlim:
             self.velocity = (self.velocity / velMagnitude) * vlim
 
-
-main()
