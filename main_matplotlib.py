@@ -2,33 +2,37 @@
 from swarm_boid import *
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 
-X_LIM = [ -100, 100 ]
-Y_LIM = [ -100, 100 ]
-swarm = Swarm( 10, X_LIM, Y_LIM )
+X_LIM = [ -300, 300 ]
+Y_LIM = [ -300, 300 ]
+swarm = Swarm( 20, X_LIM, Y_LIM )
 
-plt.ion()
-f=plt.figure()
-plt.axis([0,1000,0,1])
+fig = plt.figure()
+ax = plt.axes( xlim=X_LIM, ylim=Y_LIM )
+graph, = ax.plot([], [], 'o')
 
-for i in range(0,1000) :
-    swarm.simplePrintSwarm()
+
+def update(i) :
+    #swarm.simplePrintSwarm()
     swarm.updateSwarm()
 
-    data_pos = []
-    data_vel = []
+    boid_pos_x = []
+    boid_pos_y = []
+    
+    #data_vel = []
 
     for boid in swarm.list :
-        data_pos.append( boid.position )
-        data_vel.append( boid.velocity )
+        boid_pos_x.append( boid.position[0] )
+        boid_pos_y.append( boid.position[1] )
+        #data_vel.append( boid.velocity )
+        
+    graph.set_data(boid_pos_x, boid_pos_y)
 
-    colors = (0,0,0)
-    area = np.pi*3
-    x = np.random.rand(20)
-    y = np.random.rand(20)
+    return graph
 
-    # plt.clear()
-    plt.plot(data_pos[0], data_pos[1], s=area, c=colors, alpha=0.5)
-    plt.draw()
-    plt.pause(0.5)
+
+ani = animation.FuncAnimation(fig, update, frames=30, interval=50)
+
+plt.show()
