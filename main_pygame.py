@@ -1,4 +1,4 @@
-import swarm_boid
+from swarm_boid import *
 import numpy as np
 import pygame
 
