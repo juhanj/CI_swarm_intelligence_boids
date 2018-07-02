@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 
-X_LIM = [ -300, 300 ]
-Y_LIM = [ -300, 300 ]
-swarm = Swarm( 20, X_LIM, Y_LIM )
+X_LIM = [ -200, 200 ]
+Y_LIM = [ -200, 200 ]
+swarm = Swarm( 30, X_LIM, Y_LIM )
 
 fig = plt.figure()
 ax = plt.axes( xlim=X_LIM, ylim=Y_LIM )
@@ -33,6 +33,6 @@ def update(i) :
     return graph
 
 
-ani = animation.FuncAnimation(fig, update, frames=30, interval=50)
+ani = animation.FuncAnimation(fig, update, frames=30, interval=10)
 
 plt.show()

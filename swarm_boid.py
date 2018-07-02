@@ -58,7 +58,7 @@ class Boid:
                 if differenceMagnitude < 10:
                     correction = correction - (boid.position - self.position)
 
-        return correction
+        return correction / 2
 
     def rule2_alignment(self):
         correction = np.array([0, 0], dtype=np.float64)
@@ -80,7 +80,7 @@ class Boid:
                 correction = correction + boid.position
 
         correction = correction / (self.swarm.sizeOfFlock - 1)
-        correction = (correction - self.position) / 50
+        correction = (correction - self.position) / 100
 
         return correction
 
@@ -89,20 +89,20 @@ class Boid:
 
         # Horizontal bounds
         if self.position[0] < self.swarm.bounds[0][0]:  # xmin
-            correction[0] = 10
+            correction[0] = 1
         elif self.position[0] > self.swarm.bounds[0][1]:  # xmax
-            correction[0] = -10
+            correction[0] = -1
 
         # Vertical bounds
         if self.position[1] < self.swarm.bounds[1][0]:  # ymin
-            correction[1] = 10
+            correction[1] = 1
         elif self.position[1] > self.swarm.bounds[1][1]:  # ymax
-            correction[1] = -10
+            correction[1] = -1
 
         return correction
 
     def limitVelocity(self):
-        vlim = 10.0
+        vlim = 5.0
 
         velMagnitude = np.linalg.norm(self.velocity)
 
